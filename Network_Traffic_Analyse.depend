@@ -1,0 +1,24 @@
+# depslib dependency file v1.0
+1499170765 source:d:\codeblocks_workspace\network_traffic_analyse\header.h
+	<time.h>
+
+1499178252 source:d:\codeblocks_workspace\network_traffic_analyse\main.c
+	<stdio.h>
+	<stdlib.h>
+	<pcap.h>
+	<pthread.h>
+	<time.h>
+	<string.h>
+	"header.h"
+
+1499170765 d:\codeblocks_workspace\network_traffic_analyse\header.h
+	<time.h>
+
+1499045610 source:d:\codeblocks_workspace\network_traffic_analyse\catch_packet.c
+	<stdio.h>
+	<stdlib.h>
+	<pcap.h>
+	<pthread.h>
+	<time.h>
+	<string.h>
+
