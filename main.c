@@ -5,6 +5,8 @@
 #include <time.h>
 #include <string.h>
 #include "header.h"
+#include <sys/stat.h>
+#include <unistd.h>
 
 #define FILE_NAME "packet.txt"
 //协议个数
@@ -12,6 +14,12 @@
 //协议名称
 char protocols[PROTOCOL_COUNT][7] = {"TCP", "UDP"};
 HASH_TABLE hashTable[PROTOCOL_COUNT];
+//抓取到的第一个包的时间
+time_t first_catch_time;
+//抓取到的最后一个包的时间
+time_t last_catch_time;
+//本机IP
+char *local_ip;
 
 typedef struct _argument{
     pcap_t *handle;
@@ -27,17 +35,25 @@ void packet_handler(u_char *param, const struct pcap_pkthdr *header,
 void countMode_packet_handler(u_char *param, const struct pcap_pkthdr *header,
                   const u_char *packet_data);
 //数据报解析函数
-void parse(const u_char *packet_data, time_t catch_time, int packet_size);
+void parse(const u_char *packet_data, char *catch_time, int packet_size);
 //相关输出文件的创建函数
 int creatFile();
 //根据协议数量初始化hashtable
 void initHashTable();
+//释放hashtable占的内存
+void freeHashTable();
+//填充hashtable
+int fillHashTable(time_t start_time, time_t end_time);
+//打印流量分析结果
+void printFlowAnalyseRes(time_t start_time, time_t end_time);
 //根据协议名获取其链表位置
 int getProtocolLinkIndex(char *pro_name);
 //将数据包插入hashtable
 void insertIntoHash(HASH_TABLE *link, HASH_NODE *node);
 //流量分析
-void analyseFlow(char *pro_name);
+void analyseFlow(int time_pad);
+//字符串分割函数
+void split(char **arr, char *str, const char *del);
 
 int main(){
     /* 初始化操作 */
@@ -45,9 +61,6 @@ int main(){
     if(creatFile() == -1){
         return -1;
     }
-
-    //初始化hash表
-    initHashTable();
 
     pcap_if_t *alldevs;
     //错误信息缓存区
@@ -91,12 +104,21 @@ int main(){
 
     /* 跳转到选中的适配器 */
     for(dev = alldevs, i=0; i < num-1 ;dev = dev->next, i++);
+    /* 获得本地IP */
+    struct pcap_addr *addr = dev->addresses;
+    struct sockaddr_in *sin;
+    for(;addr;addr = addr->next){
+        sin = (struct sockaddr_in *)addr->addr;
+        if(sin->sin_family = AF_INET){
+            local_ip = inet_ntoa(sin->sin_addr);
+        }
+    }
     /* 打开设备 */
     pcap_t *devHandler;
     if ((devHandler = pcap_open(dev->name,
                                 65536,    // 65535保证能捕获到不同数据链路层上的每个数据包的全部内容
                                 PCAP_OPENFLAG_PROMISCUOUS,      //网卡进入混杂模式
-                                1000,   // 读取超时时间(意味着统计模式下每隔一秒回调一次处理函数)
+                                1000,   // 读取超时时间
                                 NULL,
                                 error_buffer)) == NULL){
         fprintf(stderr,"\n适配器打开失败,不支持%s\n", dev->name);
@@ -161,7 +183,7 @@ int main(){
     /* 开始捕获 */
     //第二个是指定捕获的数据包个数,如果为-1则无限循环捕获
     //抓到数据包后执行packet_handler回调函数
-    printf("id\ttime\t\tlength\tdata\n");
+    printf("id\ttime\t\t\tlength\tdata\n");
     pcap_loop(devHandler, -1, packet_handler, NULL);
 
     /* 关闭处理 */
@@ -169,7 +191,6 @@ int main(){
     printf("\n\t\t---抓取结束---\n\n");
 
     /* 根据输入协议名查看流量 */
-    char pro_name[10];
     printf("目前支持的协议:");
     int j;
     for(j = 0;j < PROTOCOL_COUNT;j++){
@@ -177,20 +198,27 @@ int main(){
     }
     printf("\n");
     getchar();
+
+    //初始化hash表
+    initHashTable();
+
+    int time_pad;
+    printf("\n\t\t-----查看流量分析情况----\n\n");
     while(1){
-        pro_name[0] = '\0';
-        printf("输入协议名查看其流量分析情况(end结束):");
-        gets(pro_name);
-        if(strcmp(pro_name, "end") == 0){
+        printf("输入时间间隔(秒)('-1'结束):");
+        scanf("%d", &time_pad);
+        getchar();
+
+        if(time_pad == -1){
             break;
         }
-
-        if(getProtocolLinkIndex(pro_name) == -1){
-            printf("输入错误!!!\n\n");
+        //检查输入是否合法
+        if(time_pad > arg.timeLen){
+            printf("输入错误!!!时间间隔不能大于抓取时间%ds\n\n", arg.timeLen);
             continue;
         }
 
-        analyseFlow(pro_name);
+        analyseFlow(time_pad);
     }
 
     printf("\n运行结束\n\n");
@@ -216,15 +244,25 @@ void *thread_clock(void *argv){
    第二个参数结构体是由pcap_loop自己填充的，用来取得一些关于数据包的信息 */
 void packet_handler(u_char *param, const struct pcap_pkthdr *header,
                   const u_char *packet_data){
-    struct tm *_tm;
-    char time[16];
+    struct tm _tm;
+    char time[20];
     time_t local_tv_sec;
     static int id = 0;
 
     //将时间戳转换成可识别的格式
     local_tv_sec = header->ts.tv_sec;
-    _tm = localtime(&local_tv_sec);
-    strftime(time, sizeof(time), "%H:%M:%S", _tm);
+    _tm = *localtime(&local_tv_sec);
+    sprintf(time, "%4.4d.%2.2d.%2.2d-%2.2d:%2.2d:%2.2d",
+        _tm.tm_year+1900, _tm.tm_mon + 1, _tm.tm_mday,
+        _tm.tm_hour, _tm.tm_min, _tm.tm_sec );
+
+    //strftime(time, sizeof(time), "%H:%M:%S", _tm);
+
+    //记录抓包时间
+    if(id == 0){
+        first_catch_time = local_tv_sec;
+    }
+    last_catch_time = local_tv_sec;
 
     /* 屏幕输出 */
     //len表示数据包的实际长度
@@ -238,7 +276,7 @@ void packet_handler(u_char *param, const struct pcap_pkthdr *header,
             printf(". ");
         }
         if((i%16 == 0 && i != 0) || i == header->len-1){
-            printf("\n\t\t\t\t");
+            printf("\n\t\t\t\t\t");
         }
     }
     printf("\n");
@@ -260,12 +298,12 @@ void packet_handler(u_char *param, const struct pcap_pkthdr *header,
            ether->host_dest[5]);
 
     /* 数据包解析 */
-    parse(packet_data, header->ts.tv_sec, header->len);
+    parse(packet_data, time, header->len);
 
 }
 
-/* 创建“五元组”文件 */
 int creatFile(){
+    /* 创建“五元组”文件 */
     remove(FILE_NAME);
     FILE *f;
     f = fopen(FILE_NAME, "w+");
@@ -285,11 +323,25 @@ int creatFile(){
 
     fclose(f);
 
+    /* 创建流量分析输出文件 */
+    char fileName[10];
+    int i = 0;
+    for(;i < PROTOCOL_COUNT;i++){
+        sprintf(fileName, "%s.txt", protocols[i]);
+        remove(fileName);
+        FILE *flow = fopen(fileName, "w+");
+        if(flow == NULL){
+            fprintf("%s协议流量分析文件创建失败!!\n", protocols[i]);
+            return -1;
+        }
+        fclose(flow);
+    }
+
     return 0;
 }
 
 /* 解析数据包 */
-void parse(const u_char *packet_data, time_t catch_time, int packet_size){
+void parse(const u_char *packet_data, char *catch_time, int packet_size){
     /* 获得IP数据包头部 */
     IP_HEADER *ip;
     unsigned int protocol;
@@ -330,13 +382,15 @@ void parse(const u_char *packet_data, time_t catch_time, int packet_size){
     char flag_str[100];
     char pro_name[5];
 
-    //新建hash结点
-    HASH_NODE *node = (HASH_NODE*)malloc(sizeof(HASH_NODE));
-    node->next = NULL;
-    node->catch_time = catch_time;
-    node->packet_len = packet_size;
-    strcpy(node->src_ip_addr, src_ip);
-    strcpy(node->dest_ip_addr, dest_ip);
+    /* 固定格式写入流量分析统计文件 */
+    /* 抓取时间@源IP@目的IP@源端口@目的端口@数据包长度 */
+    char file_node[100];
+    strcpy(file_node, catch_time);
+    strcat(file_node, "@");
+    strcat(file_node, src_ip);
+    strcat(file_node, "@");
+    strcat(file_node, dest_ip);
+    strcat(file_node, "@");
 
     int index;
     if(protocol == IP_TCP){             //TCP协议报头
@@ -402,53 +456,66 @@ void parse(const u_char *packet_data, time_t catch_time, int packet_size){
         strcpy(flag_str, "\t\t");
     }
 
-    //插入hash结点
-    node->src_port = src_port;
-    node->dest_port = dest_port;
-    index = getProtocolLinkIndex(pro_name);
-    HASH_TABLE *table = &hashTable[index];
-    insertIntoHash(table, node);
+    char buf[10];
+    itoa(src_port, buf, 10);
+    strcat(file_node, buf);
+    strcat(file_node, "@");
+    itoa(dest_port, buf, 10);
+    strcat(file_node, buf);
+    strcat(file_node, "@");
+    itoa(packet_len, buf, 10);
+    strcat(file_node, buf);
+    strcat(file_node, "\n");
 
+    char flowName[10];
+    sprintf(flowName, "%s.txt", pro_name);
+    FILE *flow = fopen(flowName, "a+");
+    if(flow == NULL){
+        printf("\n该数据包写入流量分析文件失败\n\n");
+    }else{
+        fprintf(flow, file_node);
+    }
+    fclose(flow);
 
+    /* 固定格式写入数据包记录文件 */
     FILE *f;
     f = fopen(FILE_NAME, "a+");
     if(f == NULL){
         printf("\n该数据包写入文件失败\n");
-        return;
+    }else{
+        char buffer[50];
+        //序号
+        sprintf(buffer, "%d\t", sequence);
+        fprintf(f, buffer);
+        //确认序号
+        sprintf(buffer, "%d\t\t", ack);
+        fprintf(f, buffer);
+        //标记位
+        sprintf(buffer, "%s\t", flag_str);
+        fprintf(f, buffer);
+        //源IP
+        fprintf(f, src_ip);
+        fprintf(f, "\t\t");
+        //目的IP
+        fprintf(f, dest_ip);
+        fprintf(f, "\t\t");
+        //源端口
+        sprintf(buffer, "%d\t\t",src_port);
+        fprintf(f, buffer);
+        //目的端口
+        sprintf(buffer, "%d\t\t",dest_port);
+        fprintf(f, buffer);
+        //协议
+        fprintf(f, pro_name);
+        fprintf(f, "\t");
+        //数据包大小
+        sprintf(buffer, "%d", data_len);
+        fprintf(f, buffer);
+        fprintf(f, "\n");
     }
-
-    char buffer[50];
-    //序号
-    sprintf(buffer, "%d\t", sequence);
-    fprintf(f, buffer);
-    //确认序号
-    sprintf(buffer, "%d\t\t", ack);
-    fprintf(f, buffer);
-    //标记位
-    sprintf(buffer, "%s\t", flag_str);
-    fprintf(f, buffer);
-    //源IP
-    fprintf(f, src_ip);
-    fprintf(f, "\t\t");
-    //目的IP
-    fprintf(f, dest_ip);
-    fprintf(f, "\t\t");
-    //源端口
-    sprintf(buffer, "%d\t\t",src_port);
-    fprintf(f, buffer);
-    //目的端口
-    sprintf(buffer, "%d\t\t",dest_port);
-    fprintf(f, buffer);
-    //协议
-    fprintf(f, pro_name);
-    fprintf(f, "\t");
-    //数据包大小
-    sprintf(buffer, "%d", data_len);
-    fprintf(f, buffer);
-    fprintf(f, "\n");
-
     fclose(f);
 
+    //打印IP
     printf("%s\t%d.%d.%d.%d:%d -> %d.%d.%d.%d:%d\n\n",pro_name,
             ip->src_ip_address.byte1,
             ip->src_ip_address.byte2,
@@ -497,23 +564,197 @@ void insertIntoHash(HASH_TABLE *link, HASH_NODE *node){
     return;
 }
 
-/* 流量分析 */
-void analyseFlow(char *pro_name){
-    int index = getProtocolLinkIndex(pro_name);
-    HASH_TABLE *table = &hashTable[index];
-    HASH_NODE *node = table->table_head;
+/* 释放前一次hashtable占的内存 */
+void freeHashTable(){
+    int i = 0;
+    for(;i < PROTOCOL_COUNT;i++){
+        int index = getProtocolLinkIndex(protocols[i]);
+        HASH_TABLE *table = &hashTable[index];
+        HASH_NODE *node = table->table_head;
 
-    if(node == NULL){
-        printf("\n\t---尚未抓取到该协议数据包---\n\n");
-        return;
+        if(node != NULL){
+            int j = 0;
+            HASH_NODE *next_node;
+            for(;j < table->node_count-1;j++){
+                next_node = node->next;
+                free(node);
+                node = next_node;
+            }
+            free(next_node);
+        }
+
+        table->node_count = 0;
+        table->table_head = NULL;
+    }
+}
+
+/* 填充hashtable */
+int fillHashTable(time_t start_time, time_t end_time){
+    freeHashTable();
+
+    /* 抓取时间@源IP@目的IP@源端口@目的端口@数据包长度 */
+    int i = 0;
+    char file_name[7];
+    for(;i < PROTOCOL_COUNT;i++){
+        sprintf(file_name, "%s.txt", protocols[i]);
+        //先判断文件中是否有数据
+        struct stat st ;
+        stat(file_name, &st);
+        if(st.st_size > 0){
+            FILE *file = fopen(file_name, "r");
+            if(file == NULL){
+                return -1;
+            }
+
+            char file_node[100];
+            while(!feof(file)){
+                fgets(file_node, 100, file);
+                strtok(file_node, "\n");
+                //字符串分割
+                char delims[] = "@";
+                char *myArray[6];
+                memset(myArray, 0x0, sizeof(myArray));
+                split(myArray, file_node, delims);
+
+                if(myArray[1] != NULL){
+                    //时间判断
+                    char *c = myArray[0];
+                    struct tm tm_tmp;
+                    time_t catch_time;
+                    sscanf( c, "%4d.%2d.%2d-%2d:%2d:%2d",
+                            &tm_tmp.tm_year,
+                            &tm_tmp.tm_mon,
+                            &tm_tmp.tm_mday,
+                            &tm_tmp.tm_hour,
+                            &tm_tmp.tm_min,
+                            &tm_tmp.tm_sec );
+
+                            tm_tmp.tm_year -= 1900;
+                            tm_tmp.tm_mon --;
+                            tm_tmp.tm_isdst=-1;
+
+                    catch_time = mktime( &tm_tmp );
+                    //链表插入
+                    if((catch_time >= start_time)&&(catch_time <= end_time)){
+                        /* 抓取时间@源IP@目的IP@源端口@目的端口@数据包长度 */
+                        HASH_NODE *node = (HASH_NODE*)malloc(sizeof(HASH_NODE));
+                        node->catch_time = catch_time;
+                        strcpy(node->src_ip_addr, myArray[1]);
+                        strcpy(node->dest_ip_addr, myArray[2]);
+                        node->src_port = atoi(myArray[3]);
+                        node->dest_port = atoi(myArray[4]);
+                        node->packet_len = atoi(myArray[5]);
+                        node->next = NULL;
+
+                        int index = getProtocolLinkIndex(protocols[i]);
+                        HASH_TABLE *table = &hashTable[index];
+                        insertIntoHash(table, node);
+                    }
+
+                }
+            }
+
+            fclose(file);
+
+        }
     }
 
-    int count = table->node_count;
-    int i;
-    for(i =0;i < count;i++){
-        printf("%d\tsrc_port:%d\tsrc_ip:%s\n",i+1,
-                node->src_port,
-                node->src_ip_addr);
-        node = node->next;
+    return 0;
+}
+
+void split(char **arr, char *str, const char *del){
+    char *s = NULL;
+    s = strtok(str, del);
+    while(s != NULL){
+        *arr++ = s;
+        s = strtok(NULL, del);
+    }
+}
+
+/* 流量分析 */
+void analyseFlow(int time_pad){
+    int res;
+    //一个时间段结束时间
+    time_t part_end_time = first_catch_time;
+    while((last_catch_time - part_end_time) > 0){
+
+        time_t end = part_end_time + time_pad;
+        if(end > last_catch_time){
+            end = last_catch_time;
+        }
+        res = fillHashTable(part_end_time, end);
+        if(res == 0){
+            printFlowAnalyseRes(part_end_time, end);
+        }else{
+            printf("该阶段分析出现错误\n");
+        }
+
+        part_end_time += time_pad;
+    }
+
+    if(last_catch_time == first_catch_time){
+        res = fillHashTable(first_catch_time, last_catch_time);
+        if(res == 0){
+            printFlowAnalyseRes(first_catch_time, last_catch_time);
+        }else{
+            printf("该阶段分析出现错误\n");
+        }
+    }
+}
+
+/* 打印流量分析结果 */
+void printFlowAnalyseRes(time_t start_time, time_t end_time){
+    //时间格式转换
+    struct tm start_tm, end_tm;
+    char start_str[30], end_str[30];
+    start_tm = *localtime(&start_time);
+    end_tm = *localtime(&end_time);
+    sprintf(start_str, "%4.4d.%2.2d.%2.2d-%2.2d:%2.2d:%2.2d",
+            start_tm.tm_year+1900, start_tm.tm_mon+1, start_tm.tm_mday,
+            start_tm.tm_hour, start_tm.tm_min, start_tm.tm_sec);
+    sprintf(end_str, "%4.4d.%2.2d.%2.2d-%2.2d:%2.2d:%2.2d",
+            end_tm.tm_year+1900, end_tm.tm_mon+1, end_tm.tm_mday,
+            end_tm.tm_hour, end_tm.tm_min, end_tm.tm_sec);
+    printf("\n\t******** %s -> %s ********\n", start_str, end_str);
+
+    int i = 0;
+    for(;i < PROTOCOL_COUNT;i++){
+        int index = getProtocolLinkIndex(protocols[i]);
+        printf("%s:\t", protocols[i]);
+        HASH_TABLE *table = &hashTable[index];
+        HASH_NODE *node = table->table_head;
+
+        if(node == NULL){
+            printf("未抓取到该协议数据包\n\n");
+        }else{
+            //每秒比特数、数据包数量
+            unsigned int up_bps = 0;
+            unsigned int up_pps = 0;
+            unsigned int up_packet_count = 0;
+            unsigned int down_bps = 0;
+            unsigned int down_pps = 0;
+
+            int count = table->node_count;
+            int j;
+            for(j = 0;j < count;j++){
+                if(strcmp(local_ip, node->src_ip_addr) == 0){       //上行
+                    up_bps += node->packet_len;
+                    up_pps++;
+                }else if(strcmp(local_ip, node->dest_ip_addr) == 0){       //下行
+                    down_bps += node->packet_len;
+                    down_pps++;
+                }
+
+                node = node->next;
+            }
+
+            int time_pad = 1;
+            if(end_time > start_time){
+                time_pad = end_time - start_time;
+            }
+            printf("上行bps:%db/s\t上行pps:%d个\n", (up_bps *8) / time_pad, up_pps);
+            printf("\t下行bps:%db/s\t\t下行pps:%d个\n", (down_bps *8) / time_pad, down_pps);
+
+        }
     }
 }
