@@ -1,0 +1,321 @@
+GET /kingcat666/article/details/44837357 HTTP/1.1
+Host: blog.csdn.net
+Connection: keep-alive
+Cache-Control: max-age=0
+Upgrade-Insecure-Requests: 1
+User-Agent: Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/59.0.3071.86 Safari/537.36
+Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8
+Referer: https://www.baidu.com/link?url=uJhoHsHg9UEQ2rJofnv9Q6yyvdWIGzXZwHrkHDTfYgdx9kH5ugm88-ZQPgkqK5wzss0WkSW9XVUz0VG4_E4saDJiQ4Vua9MwbFZlQCC_n27&wd=&eqid=e8cc00df0000beaf00000005595dddc6
+Accept-Encoding: gzip, deflate
+Accept-Language: zh-CN,zh;q=0.8,en;q=0.6
+Cookie: uuid=af1cd49c-dc1b-439f-bf75-0f899e3807b1; bdshare_firstime=1499265572123; uuid_tt_dd=2251948091719239024_20170705; avh=6254546 8642491 $44837357; Hm_lvt_6bcd52f51e9b3dce32bec4a3997715ac=1499323852,1499324491,1499324720,1499324953; Hm_lpvt_6bcd52f51e9b3dce32bec4a3997715ac=1499324953; dc_tos=osnqjd; dc_session_id=1499324953527
+If-None-Match: W/"58e96bdad04b25557252b85bfcae3b18"
+
+.ã]Y_	
+
+GET /v.gif?pid=307&type=3075&l=274049&t=1600&s=274050&v=638&f=8000&r=https0X1.D29600P+852%2Fwww.baidu.com 1nk  0rlDuJhoHsHg9UEQ2rJofnv9Q6yyvdWIGzXZwHrkHDTfYgdx9kH5ugm88-ZQPgkqK5wzss0WkSW9XVUz0VG4_E4saDJiQ4Vua9MwbFZlQCC_n27                         0D             0.000000e+000qidDe8cc00df0000beaf00000005595dddc6&u=http0X0.000000P+0%2Fblog.csdn.netkingcat6660x0.000000p+0rticle 0etails44837357 HTTP/1.1
+Host: nsclick.baidu.com
+Connection: keep-alive
+Cache-Control: max-age=0
+User-Agent: Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/59.0.3071.86 Safari/537.36
+Accept: */*
+Referer: http://blog.csdn.net/kingcat666/article/details/44837357
+Accept-Encoding: gzip, deflate
+Accept-Language: zh-CN,zh;q=0.8,en;q=0.6
+Cookie: BAIDUID=951445C4FA9BDF0343660A0FE51964F6:FG=1; PSTM=1499263197; BIDUPSID=6B432FBD3164ABB1BD5B845EC664E8CB; PSINO=3; H_PS_PSSID=1467_21098_20929; BDORZ=B490B5EBF6F3CD402E515D22BCDA1598
+
+
+
+GET /v.gif?pid=307&type=3075&l=273885&t=1600&s=273886&v=638&f=6000&r=https0X1.D29600P+852%2Fwww.baidu.com 1nk  0rlDuJhoHsHg9UEQ2rJofnv9Q6yyvdWIGzXZwHrkHDTfYgdx9kH5ugm88-ZQPgkqK5wzss0WkSW9XVUz0VG4_E4saDJiQ4Vua9MwbFZlQCC_n27                         0D             0.000000e+000qidDe8cc00df0000beaf00000005595dddc6&u=http0X0.000000P+0%2Fblog.csdn.netkingcat6660x0.000000p+0rticle 0etails44837357 HTTP/1.1
+Host: nsclick.baidu.com
+Connection: keep-alive
+Cache-Control: max-age=0
+User-Agent: Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/59.0.3071.86 Safari/537.36
+Accept: */*
+Referer: http://blog.csdn.net/kingcat666/article/details/44837357
+Accept-Encoding: gzip, deflate
+Accept-Language: zh-CN,zh;q=0.8,en;q=0.6
+Cookie: BAIDUID=951445C4FA9BDF0343660A0FE51964F6:FG=1; PSTM=1499263197; BIDUPSID=6B432FBD3164ABB1BD5B845EC664E8CB; PSINO=3; H_PS_PSSID=1467_21098_20929; BDORZ=B490B5EBF6F3CD402E515D22BCDA1598
+
+·=.ã]Yxß	
+
+GET /a.js?tu=u2895327&op=1&jk=b3e58a8b264bfa5f&word=http0X1.D29600P+852%2Fblog.csdn.netkingcat6660x0.000000p-1022rticle 0etails44837357&if=0&aw=300&ah=250&pt=152000&it=23000&vt=22724&csp=1366,728&bcl=1349,638&pof=1349,3715&top=1984&left=1049&total=4&rdm=1499325230551 HTTP/1.1
+Host: eclick.baidu.com
+Connection: keep-alive
+Cache-Control: max-age=0
+User-Agent: Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/59.0.3071.86 Safari/537.36
+Accept: */*
+Referer: http://blog.csdn.net/kingcat666/article/details/44837357
+Accept-Encoding: gzip, deflate
+Accept-Language: zh-CN,zh;q=0.8,en;q=0.6
+Cookie: BAIDUID=951445C4FA9BDF0343660A0FE51964F6:FG=1; PSTM=1499263197; BIDUPSID=6B432FBD3164ABB1BD5B845EC664E8CB; PSINO=3; H_PS_PSSID=1467_21098_20929; BDORZ=B490B5EBF6F3CD402E515D22BCDA1598
+
+£	
+
+GET /a.js?tu=u2843949&op=1&jk=e1ac2254192018e2&word=http0X1.D29600P+852%2Fblog.csdn.netkingcat6660x0.000000p-1022rticle 0etails44837357&if=0&aw=728&ah=90&pt=152500&it=0&vt=0&csp=1366,728&bcl=1349,638&pof=1349,3715&top=3029&left=405&rdm=1499325230552 HTTP/1.1
+Host: eclick.baidu.com
+Connection: keep-alive
+Cache-Control: max-age=0
+User-Agent: Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/59.0.3071.86 Safari/537.36
+Accept: */*
+Referer: http://blog.csdn.net/kingcat666/article/details/44837357
+Accept-Encoding: gzip, deflate
+Accept-Language: zh-CN,zh;q=0.8,en;q=0.6
+Cookie: BAIDUID=951445C4FA9BDF0343660A0FE51964F6:FG=1; PSTM=1499263197; BIDUPSID=6B432FBD3164ABB1BD5B845EC664E8CB; PSINO=3; H_PS_PSSID=1467_21098_20929; BDORZ=B490B5EBF6F3CD402E515D22BCDA1598
+
+
+
+GET /a.js?tu=u1607657&op=1&jk=2ff392f963f91fc8&word=http0X1.D29600P+852%2Fblog.csdn.netkingcat6660x0.000000p-1022rticle 0etails44837357&if=0&aw=728&ah=90&pt=152500&it=0&vt=0&csp=1366,728&bcl=1349,638&pof=1349,3715&top=3326&left=405&rdm=1499325230552 HTTP/1.1
+Host: eclick.baidu.com
+Connection: keep-alive
+Cache-Control: max-age=0
+User-Agent: Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/59.0.3071.86 Safari/537.36
+Accept: */*
+Referer: http://blog.csdn.net/kingcat666/article/details/44837357
+Accept-Encoding: gzip, deflate
+Accept-Language: zh-CN,zh;q=0.8,en;q=0.6
+Cookie: BAIDUID=951445C4FA9BDF0343660A0FE51964F6:FG=1; PSTM=1499263197; BIDUPSID=6B432FBD3164ABB1BD5B845EC664E8CB; PSINO=3; H_PS_PSSID=1467_21098_20929; BDORZ=B490B5EBF6F3CD402E515D22BCDA1598
+
+
+
+GET /a.js?tu=u2734128&op=1&jk=efd77286825b4438&word=http0X1.D29600P+852%2Fblog.csdn.netkingcat6660x0.000000p-1022rticle 0etails44837357&if=0&aw=200&ah=200&pt=152500&it=0&vt=0&csp=1366,728&bcl=1349,638&pof=1349,3715&top=2397&left=194&rdm=1499325230552 HTTP/1.1
+Host: eclick.baidu.com
+Connection: keep-alive
+Cache-Control: max-age=0
+User-Agent: Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/59.0.3071.86 Safari/537.36
+Accept: */*
+Referer: http://blog.csdn.net/kingcat666/article/details/44837357
+Accept-Encoding: gzip, deflate
+Accept-Language: zh-CN,zh;q=0.8,en;q=0.6
+Cookie: BAIDUID=951445C4FA9BDF0343660A0FE51964F6:FG=1; PSTM=1499263197; BIDUPSID=6B432FBD3164ABB1BD5B845EC664E8CB; PSINO=3; H_PS_PSSID=1467_21098_20929; BDORZ=B490B5EBF6F3CD402E515D22BCDA1598
+
+.ã]Yª
+
+
+HTTP/1.1 200 OK
+Accept-Ranges: bytes
+Cache-Control: max-age=0
+Content-Length: 0
+Content-Type: image/gif
+Date: Thu, 06 Jul 2017 07:13:50 GMT
+Etag: "4280832337"
+Expires: Thu, 06 Jul 2017 07:13:50 GMT
+Last-Modified: Fri, 23 Oct 2009 08:06:04 GMT
+Pragma: no-cache
+Server: BWS/1.0
+
+
+
+HTTP/1.1 200 OK
+Accept-Ranges: bytes
+Cache-Control: max-age=0
+Content-Length: 0
+Content-Type: image/gif
+Date: Thu, 06 Jul 2017 07:13:50 GMT
+Etag: "4280832337"
+Expires: Thu, 06 Jul 2017 07:13:50 GMT
+Last-Modified: Fri, 23 Oct 2009 08:06:04 GMT
+Pragma: no-cache
+Server: BWS/1.0
+
+
+
+HTTP/1.1 200 OK
+Server: nginx
+Date: Thu, 06 Jul 2017 07:13:50 GMT
+Content-Type: application/x-javascript
+Content-Length: 0
+Last-Modified: Mon, 03 Jul 2017 07:55:45 GMT
+Connection: keep-alive
+ETag: "5959f881-0"
+Expires: Thu, 06 Jul 2017 08:13:50 GMT
+Cache-Control: max-age=3600
+Accept-Ranges: bytes
+
+
+
+HTTP/1.1 200 OK
+Server: nginx
+Date: Thu, 06 Jul 2017 07:13:50 GMT
+Content-Type: application/x-javascript
+Content-Length: 0
+Last-Modified: Mon, 03 Jul 2017 07:55:45 GMT
+Connection: keep-alive
+ETag: "5959f881-0"
+Expires: Thu, 06 Jul 2017 08:13:50 GMT
+Cache-Control: max-age=3600
+Accept-Ranges: bytes
+
+
+
+HTTP/1.1 200 OK
+Server: nginx
+Date: Thu, 06 Jul 2017 07:13:50 GMT
+Content-Type: application/x-javascript
+Content-Length: 0
+Last-Modified: Mon, 03 Jul 2017 07:55:45 GMT
+Connection: keep-alive
+ETag: "5959f881-0"
+Expires: Thu, 06 Jul 2017 08:13:50 GMT
+Cache-Control: max-age=3600
+Accept-Ranges: bytes
+
+
+
+HTTP/1.1 200 OK
+Server: nginx
+Date: Thu, 06 Jul 2017 07:13:50 GMT
+Content-Type: application/x-javascript
+Content-Length: 0
+Last-Modified: Mon, 03 Jul 2017 07:55:45 GMT
+Connection: keep-alive
+ETag: "5959f881-0"
+Expires: Thu, 06 Jul 2017 08:13:50 GMT
+Cache-Control: max-age=3600
+Accept-Ranges: bytes
+
+
+
+HTTP/1.1 200 OK
+Server: openresty
+Date: Thu, 06 Jul 2017 07:13:50 GMT
+Content-Type: text/html; charset=utf-8
+Transfer-Encoding: chunked
+Connection: keep-alive
+Keep-Alive: timeout=20
+Vary: Accept-Encoding
+Cache-Control: private, max-age=0, must-revalidate
+ETag: W/"83bb795e25de2f35edf36834faa153b3"
+X-Powered-By: PHP 5.4.28
+Content-Encoding: gzip
+
+3cee
+‹
+
+HTTP/1.1 200 OK
+Accept-Ranges: bytes
+Cache-Control: max-age=0
+Content-Length: 0
+Content-Type: image/gif
+Date: Thu, 06 Jul 2017 07:13:50 GMT
+Etag: "4280832337"
+Expires: Thu, 06 Jul 2017 07:13:50 GMT
+Last-Modified: Fri, 23 Oct 2009 08:06:04 GMT
+Pragma: no-cache
+Server: BWS/1.0
+
+
+
+HTTP/1.1 200 OK
+Accept-Ranges: bytes
+Cache-Control: max-age=0
+Content-Length: 0
+Content-Type: image/gif
+Date: Thu, 06 Jul 2017 07:13:50 GMT
+Etag: "4280832337"
+Expires: Thu, 06 Jul 2017 07:13:50 GMT
+Last-Modified: Fri, 23 Oct 2009 08:06:04 GMT
+Pragma: no-cache
+Server: BWS/1.0
+
+
+
+HTTP/1.1 200 OK
+Server: nginx
+Date: Thu, 06 Jul 2017 07:13:50 GMT
+Content-Type: application/x-javascript
+Content-Length: 0
+Last-Modified: Mon, 03 Jul 2017 07:55:45 GMT
+Connection: keep-alive
+ETag: "5959f881-0"
+Expires: Thu, 06 Jul 2017 08:13:50 GMT
+Cache-Control: max-age=3600
+Accept-Ranges: bytes
+
+
+
+GET /css/csdn_blog_detail.min.css HTTP/1.1
+Host: static.blog.csdn.net
+Connection: keep-alive
+User-Agent: Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/59.0.3071.86 Safari/537.36
+Accept: text/css,*/*;q=0.1
+Referer: http://blog.csdn.net/kingcat666/article/details/44837357
+Accept-Encoding: gzip, deflate
+Accept-Language: zh-CN,zh;q=0.8,en;q=0.6
+Cookie: uuid_tt_dd=2251948091719239024_20170705; Hm_lvt_6bcd52f51e9b3dce32bec4a3997715ac=1499323852,1499324491,1499324720,1499324953; Hm_lpvt_6bcd52f51e9b3dce32bec4a3997715ac=1499324953; dc_tos=osnqjd; dc_session_id=1499324953527
+If-None-Match: W/"d166367de9d21:0"
+If-Modified-Since: Tue, 20 Jun 2017 04:23:53 GMT
+
+
+
+HTTP/1.1 304 Not Modified
+Server: Tengine
+Content-Type: text/css
+Connection: keep-alive
+Date: Thu, 29 Jun 2017 06:37:26 GMT
+Vary: Accept-Encoding
+Last-Modified: Tue, 20 Jun 2017 04:23:53 GMT
+Accept-Ranges: bytes
+ETag: "d166367de9d21:0"
+X-Powered-By: PHP 5.4.28
+Access-Control-Allow-Origin: *
+Expires: Thu, 06 Jul 2017 06:37:26 GMT
+Cache-Control: max-age=604800
+Via: cache12.l2st4-3[0,200-0,H], cache10.l2st4-3[0,0], kunlun9.cn74[0,304-0,H], kunlun8.cn74[0,0]
+Age: 606984
+X-Cache: HIT TCP_IMS_HIT dirn:11:77699960
+Timing-Allow-Origin: *
+EagleId: deba31a114993252309355355e
+
+
+
+GET /showblogmedal.ashx?blogid=1397632 HTTP/1.1
+Host: medal.blog.csdn.net
+Connection: keep-alive
+User-Agent: Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/59.0.3071.86 Safari/537.36
+Accept: */*
+Referer: http://blog.csdn.net/kingcat666/article/details/44837357
+Accept-Encoding: gzip, deflate
+Accept-Language: zh-CN,zh;q=0.8,en;q=0.6
+Cookie: uuid_tt_dd=2251948091719239024_20170705; Hm_lvt_6bcd52f51e9b3dce32bec4a3997715ac=1499323852,1499324491,1499324720,1499324953; Hm_lpvt_6bcd52f51e9b3dce32bec4a3997715ac=1499324953; dc_tos=osnqjd; dc_session_id=1499324953527
+
+/ã]YZo
+
+GET /ncim?rdid=2895327&dc=3&di=u2895327&dri=0&dis=0&dai=1&ps=638x1342&dcb=___adblockplus&dtm=HTML_POST&dvi=0.0&dci=-1&dpt=none&tsr=0&tpr=1499325231088&ti=C BB3.093795E-3144B80X0.000000P+0D0.000000E+00070X0.000000P+0%E50X0.000000P+0D%E70X1.8F71C0P-1021C0X1.E00000P-98061.851272E-3054B8B21.325811E-31760X1.8F6480P-1021F%E8BE%E5%BD0.000000E+0006%B0strcmpmemcmpString.Compare String0X1.D00000P-1020CompareN&ari=2&dbv=2&drs=1&pcs=1366x638&pss=1366x0&cfv=0&cpl=5&chi=1&cce=true&cec=UTF-8&tlm=1499325231&rw=638&ltu=http0X0.000F40P-1022%2Fblog.csdn.netkingcat6660x0.000280p-1022rticle18etails44837357&ltr=https0X1.E004E0P-980%2Fwww.baidu.com2682768nk8713264rlDuJhoHsHg9UEQ2rJofnv9Q6yyvdWIGzXZwHrkHDTfYgdx9kH5ugm88-ZQPgkqK5wzss0WkSW9XVUz0VG4_E4saDJiQ4Vua9MwbFZlQCC_n27                     16384D             1.613179e-307qidDe8cc00df0000beaf00000005595dddc6&ecd=1&uc=1366x728&pis=-1x-1&sr=1366x768&tcn=1499325231&qn=b3e58a8b264bfa5f&tt=1499325231041.51.52.54 HTTP/1.1
+Host: pos.baidu.com
+Connection: keep-alive
+Upgrade-Insecure-Requests: 1
+User-Agent: Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/59.0.3071.86 Safari/537.36
+Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8
+Referer: http://blog.csdn.net/kingcat666/article/details/44837357
+Accept-Encoding: gzip, deflate
+Accept-Language: zh-CN,zh;q=0.8,en;q=0.6
+Cookie: BAIDUID=951445C4FA9BDF0343660A0FE51964F6:FG=1; PSTM=1499263197; BIDUPSID=6B432FBD3164ABB1BD5B845EC664E8CB; LDID=7E53B09F4F34E2A21F1D46F886B91DD4:FG=1; CPROID=951445C4FA9BDF0343660A0FE51964F6:FG=1; ISBID=951445C4FA
+
+HTTP/1.1 200 OK
+Server: openresty
+Date: Thu, 06 Jul 2017 07:13:51 GMT
+Content-Type: application/x-javascript; charset=utf-8
+Content-Length: 15
+Connection: keep-alive
+Keep-Alive: timeout=20
+Cache-Control: private
+X-AspNet-Version: 4.0.30319
+X-Powered-By: PHP 5.4.28
+
+printMedal([]);
+
+GET /images/ico_Repost.gif HTTP/1.1
+Host: static.blog.csdn.net
+Connection: keep-alive
+If-None-Match: "b4686ee1662cc1:0"
+If-Modified-Since: Wed, 24 Aug 2011 02:38:17 GMT
+User-Agent: Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/59.0.3071.86 Safari/537.36
+Accept: image/webp,image/apng,image/*,*/*;q=0.8
+Referer: http://static.blog.csdn.net/skin/default/css/style.css?v=1.1
+Accept-Encoding: gzip, deflate
+Accept-Language: zh-CN,zh;q=0.8,en;q=0.6
+Cookie: uuid_tt_dd=2251948091719239024_20170705; Hm_lvt_6bcd52f51e9b3dce32bec4a3997715ac=1499323852,1499324491,1499324720,1499324953; Hm_lpvt_6bcd52f51e9b3dce32bec4a3997715ac=1499324953; dc_tos=osnqjd; dc_session_id=1499324953527
+
+
+

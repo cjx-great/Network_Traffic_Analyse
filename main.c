@@ -57,8 +57,6 @@ void insertIntoHash(HASH_TABLE *link, HASH_NODE *node);
 void analyseFlow(int time_pad);
 //字符串分割函数
 void split(char **arr, char *str, const char *del);
-//字符是否可读
-boolean isReadable(char *c);
 //解析HTTP
 int parseHTTP(char *tcp_packet, int tcp_data_len, int tcp_head_len);
 
@@ -691,7 +689,7 @@ void printFlowAnalyseRes(time_t start_time, time_t end_time){
     sprintf(end_str, "%4.4d.%2.2d.%2.2d-%2.2d:%2.2d:%2.2d",
             end_tm.tm_year+1900, end_tm.tm_mon+1, end_tm.tm_mday,
             end_tm.tm_hour, end_tm.tm_min, end_tm.tm_sec);
-    printf("\n\t******** %s -> %s ********\n", start_str, end_str);
+    printf("\n\t-------- %s -> %s --------\n\n", start_str, end_str);
 
     int i = 0;
     for(;i < PROTOCOL_COUNT;i++){
@@ -735,44 +733,33 @@ void printFlowAnalyseRes(time_t start_time, time_t end_time){
     }
 }
 
-/* 字符是否可读 */
-boolean isReadable(char *c){
-    return isalnum(c) || ispunct(c) || isspace(c) || isprint(c);
-}
-
 /* 解析HTTP */
 int parseHTTP(char *tcp_packet, int tcp_data_len, int tcp_head_len){
     if(tcp_data_len > 0){
-        int i = 0;
         char *data = (tcp_packet + tcp_head_len);
-        int find = 0;
-        char http_text[1024];
+        printf("%s\n", data);
+        char http_text[3000];
         strcpy(http_text, "");
-        for(;i < tcp_data_len;i++){
-            //检查请求报文
-            if((find == 0) &&
-                        (((i+3 < tcp_data_len)&&strcmp(data+i, "GET")==0)
-                            || ((i+4 < tcp_data_len)&&strcmp(data+i, "POST")==0))){
-                find = 1;
-            }
-            //检查响应报文
-            if((find == 0) && ((i+8 < tcp_data_len)&&(strcmp(data+i, "HTTP/1.1 ")==0))){
-                find = 1;
-            }
+        //检查请求报文
+        int find = 0;
+        if((strncmp(data, "GET", 3) == 0) || (strncmp(data, "POST", 4) == 0)){
+            find = 1;
+        }
 
-            if((find == 1) && (isReadable(data[i]))){
-                strcat(http_text, data[i]);
+        //检查响应报文
+        if(find == 0){
+            if(strncmp(data, "HTTP/1.1", 8) == 0){
+                find = 1;
             }
         }
 
-        if(strcmp(http_text, "") != 0){
-            //将http协议内容写入文件
+        if(find == 1){
             FILE *f;
             f = fopen(HTTP_CONTENT_FILE_NAME, "a+");
             if(f == NULL){
                 printf("\n该数据包写入文件失败\n");
             }else{
-                fprintf(f, http_text);
+                fprintf(f, data);
                 fprintf(f, "\n\n");
             }
             fclose(f);
