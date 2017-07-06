@@ -7,12 +7,15 @@
 #include "header.h"
 #include <sys/stat.h>
 #include <unistd.h>
+#include <ctype.h>
 
 #define FILE_NAME "packet.txt"
+#define HTTP_CONTENT_FILE_NAME "HTTP_content.txt"
+
 //协议个数
-#define PROTOCOL_COUNT 2
+#define PROTOCOL_COUNT 3
 //协议名称
-char protocols[PROTOCOL_COUNT][7] = {"TCP", "UDP"};
+char protocols[PROTOCOL_COUNT][7] = {"TCP", "UDP", "HTTP"};
 HASH_TABLE hashTable[PROTOCOL_COUNT];
 //抓取到的第一个包的时间
 time_t first_catch_time;
@@ -54,6 +57,21 @@ void insertIntoHash(HASH_TABLE *link, HASH_NODE *node);
 void analyseFlow(int time_pad);
 //字符串分割函数
 void split(char **arr, char *str, const char *del);
+//字符是否可读
+boolean isReadable(char *c);
+//解析HTTP
+int parseHTTP(char *tcp_packet, int tcp_data_len, int tcp_head_len);
+
+//固定格式写入数据包记录文件
+void writeFile(unsigned int sequence, unsigned int ack,
+               char *flag_str, char *src_ip, char *dest_ip,
+               unsigned short src_port, unsigned short dest_port,
+               char *pro_name, unsigned int data_len);
+
+//固定格式写入流量分析文件
+void writeFlowFile(char *catch_time, char *src_ip, char *dest_ip,
+                   unsigned short src_port, unsigned short dest_port,
+                   unsigned int packet_len, char *pro_name);
 
 int main(){
     /* 初始化操作 */
@@ -256,8 +274,6 @@ void packet_handler(u_char *param, const struct pcap_pkthdr *header,
         _tm.tm_year+1900, _tm.tm_mon + 1, _tm.tm_mday,
         _tm.tm_hour, _tm.tm_min, _tm.tm_sec );
 
-    //strftime(time, sizeof(time), "%H:%M:%S", _tm);
-
     //记录抓包时间
     if(id == 0){
         first_catch_time = local_tv_sec;
@@ -311,8 +327,8 @@ int creatFile(){
         printf("\n输出文件创建失败!!\n");
         return -1;
     }
-    fprintf(f, "序号\t");
-    fprintf(f, "确认序号\t");
+    fprintf(f, "序号\t\t\t");
+    fprintf(f, "确认序号\t\t\t");
     fprintf(f, "标记位\t\t\t");
     fprintf(f, "源IP\t\t\t");
     fprintf(f, "目的IP\t\t\t");
@@ -332,10 +348,22 @@ int creatFile(){
         FILE *flow = fopen(fileName, "w+");
         if(flow == NULL){
             fprintf("%s协议流量分析文件创建失败!!\n", protocols[i]);
+            fclose(flow);
             return -1;
         }
         fclose(flow);
     }
+
+    FILE *http;
+    remove(HTTP_CONTENT_FILE_NAME);
+    http = fopen(HTTP_CONTENT_FILE_NAME, "w+");
+    if(http == NULL){
+        fprintf("%s协议内容收集文件创建失败!!\n", "HTTP");
+        fclose(http);
+        return -1;
+    }
+
+    fclose(http);
 
     return 0;
 }
@@ -374,23 +402,13 @@ void parse(const u_char *packet_data, char *catch_time, int packet_size){
             ip->dest_ip_address.byte4);
 
     unsigned short src_port, dest_port;
-    unsigned int ack;
-    unsigned int sequence;
+    unsigned int ack = 0;
+    unsigned int sequence = 0;
     unsigned short flag;
     //数据长度
     unsigned int data_len;
     char flag_str[100];
     char pro_name[5];
-
-    /* 固定格式写入流量分析统计文件 */
-    /* 抓取时间@源IP@目的IP@源端口@目的端口@数据包长度 */
-    char file_node[100];
-    strcpy(file_node, catch_time);
-    strcat(file_node, "@");
-    strcat(file_node, src_ip);
-    strcat(file_node, "@");
-    strcat(file_node, dest_ip);
-    strcat(file_node, "@");
 
     int index;
     if(protocol == IP_TCP){             //TCP协议报头
@@ -403,8 +421,8 @@ void parse(const u_char *packet_data, char *catch_time, int packet_size){
         //小端模式：最低位放低地址
         src_port = ntohs(tcp->src_port);
         dest_port = ntohs(tcp->dest_port);
-        ack = ntohs(tcp->ack);
-        sequence = ntohs(tcp->sequence);
+        ack = ntohl(tcp->ack);
+        sequence = ntohl(tcp->sequence);
         //TCP首部长度
         unsigned short hrf = ntohs(tcp->headlen_retain_flag);
         unsigned int tcp_head_len = ((hrf & 0xf000) >> 12)*4;
@@ -434,6 +452,17 @@ void parse(const u_char *packet_data, char *catch_time, int packet_size){
 
         strcpy(pro_name, "TCP");
 
+        writeFlowFile(catch_time, src_ip, dest_ip, src_port,
+                  dest_port, packet_len, pro_name);
+
+        int isHTTP;
+        //判断tcp内部报文是否为http
+        isHTTP = parseHTTP((char *)tcp, data_len, tcp_head_len);
+        if(isHTTP != 0){
+            writeFlowFile(catch_time, src_ip, dest_ip, src_port,
+                          dest_port, data_len, "HTTP");
+        }
+
     }else if(protocol == IP_UDP){                //UDP协议报头
         /* 获得UDP首部 */
         UDP_HEADER *udp;
@@ -447,73 +476,20 @@ void parse(const u_char *packet_data, char *catch_time, int packet_size){
         data_len = packet_len - tcp_head_len;
 
         strcpy(flag_str, "\t\t");
-        ack = -1;
-        sequence = -1;
+        ack = 0;
+        sequence = 0;
         strcpy(pro_name, "UDP");
+
+        writeFlowFile(catch_time, src_ip, dest_ip, src_port,
+                  dest_port, packet_len, pro_name);
 
     }else{
         // TODO 其它协议
-        strcpy(flag_str, "\t\t");
+        return;
     }
 
-    char buf[10];
-    itoa(src_port, buf, 10);
-    strcat(file_node, buf);
-    strcat(file_node, "@");
-    itoa(dest_port, buf, 10);
-    strcat(file_node, buf);
-    strcat(file_node, "@");
-    itoa(packet_len, buf, 10);
-    strcat(file_node, buf);
-    strcat(file_node, "\n");
-
-    char flowName[10];
-    sprintf(flowName, "%s.txt", pro_name);
-    FILE *flow = fopen(flowName, "a+");
-    if(flow == NULL){
-        printf("\n该数据包写入流量分析文件失败\n\n");
-    }else{
-        fprintf(flow, file_node);
-    }
-    fclose(flow);
-
-    /* 固定格式写入数据包记录文件 */
-    FILE *f;
-    f = fopen(FILE_NAME, "a+");
-    if(f == NULL){
-        printf("\n该数据包写入文件失败\n");
-    }else{
-        char buffer[50];
-        //序号
-        sprintf(buffer, "%d\t", sequence);
-        fprintf(f, buffer);
-        //确认序号
-        sprintf(buffer, "%d\t\t", ack);
-        fprintf(f, buffer);
-        //标记位
-        sprintf(buffer, "%s\t", flag_str);
-        fprintf(f, buffer);
-        //源IP
-        fprintf(f, src_ip);
-        fprintf(f, "\t\t");
-        //目的IP
-        fprintf(f, dest_ip);
-        fprintf(f, "\t\t");
-        //源端口
-        sprintf(buffer, "%d\t\t",src_port);
-        fprintf(f, buffer);
-        //目的端口
-        sprintf(buffer, "%d\t\t",dest_port);
-        fprintf(f, buffer);
-        //协议
-        fprintf(f, pro_name);
-        fprintf(f, "\t");
-        //数据包大小
-        sprintf(buffer, "%d", data_len);
-        fprintf(f, buffer);
-        fprintf(f, "\n");
-    }
-    fclose(f);
+    writeFile(sequence, ack, flag_str, src_ip, dest_ip,
+              src_port, dest_port, pro_name, data_len);
 
     //打印IP
     printf("%s\t%d.%d.%d.%d:%d -> %d.%d.%d.%d:%d\n\n",pro_name,
@@ -757,4 +733,130 @@ void printFlowAnalyseRes(time_t start_time, time_t end_time){
 
         }
     }
+}
+
+/* 字符是否可读 */
+boolean isReadable(char *c){
+    return isalnum(c) || ispunct(c) || isspace(c) || isprint(c);
+}
+
+/* 解析HTTP */
+int parseHTTP(char *tcp_packet, int tcp_data_len, int tcp_head_len){
+    if(tcp_data_len > 0){
+        int i = 0;
+        char *data = (tcp_packet + tcp_head_len);
+        int find = 0;
+        char http_text[1024];
+        strcpy(http_text, "");
+        for(;i < tcp_data_len;i++){
+            //检查请求报文
+            if((find == 0) &&
+                        (((i+3 < tcp_data_len)&&strcmp(data+i, "GET")==0)
+                            || ((i+4 < tcp_data_len)&&strcmp(data+i, "POST")==0))){
+                find = 1;
+            }
+            //检查响应报文
+            if((find == 0) && ((i+8 < tcp_data_len)&&(strcmp(data+i, "HTTP/1.1 ")==0))){
+                find = 1;
+            }
+
+            if((find == 1) && (isReadable(data[i]))){
+                strcat(http_text, data[i]);
+            }
+        }
+
+        if(strcmp(http_text, "") != 0){
+            //将http协议内容写入文件
+            FILE *f;
+            f = fopen(HTTP_CONTENT_FILE_NAME, "a+");
+            if(f == NULL){
+                printf("\n该数据包写入文件失败\n");
+            }else{
+                fprintf(f, http_text);
+                fprintf(f, "\n\n");
+            }
+            fclose(f);
+
+            return 1;
+        }
+    }
+
+    return 0;
+}
+
+/* 固定格式写入数据包记录文件 */
+void writeFile(unsigned int sequence, unsigned int ack,
+               char *flag_str, char *src_ip, char *dest_ip,
+               unsigned short src_port, unsigned short dest_port,
+               char *pro_name, unsigned int data_len){
+    FILE *f;
+    f = fopen(FILE_NAME, "a+");
+    if(f == NULL){
+        printf("\n该数据包写入文件失败\n");
+    }else{
+        char buffer[50];
+        //序号
+        sprintf(buffer, "%-16u\t", sequence);
+        fprintf(f, buffer);
+        //确认序号
+        sprintf(buffer, "%-16u\t\t", ack);
+        fprintf(f, buffer);
+        //标记位
+        sprintf(buffer, "%s\t", flag_str);
+        fprintf(f, buffer);
+        //源IP
+        fprintf(f, src_ip);
+        fprintf(f, "\t\t");
+        //目的IP
+        fprintf(f, dest_ip);
+        fprintf(f, "\t\t");
+        //源端口
+        sprintf(buffer, "%d\t\t",src_port);
+        fprintf(f, buffer);
+        //目的端口
+        sprintf(buffer, "%d\t\t",dest_port);
+        fprintf(f, buffer);
+        //协议
+        fprintf(f, pro_name);
+        fprintf(f, "\t");
+        //数据包大小
+        sprintf(buffer, "%d", data_len);
+        fprintf(f, buffer);
+        fprintf(f, "\n");
+    }
+    fclose(f);
+}
+
+/* 固定格式写入流量分析文件 */
+void writeFlowFile(char *catch_time, char *src_ip, char *dest_ip,
+                   unsigned short src_port, unsigned short dest_port,
+                   unsigned int packet_len, char *pro_name){
+    /* 抓取时间@源IP@目的IP@源端口@目的端口@数据包长度 */
+    char buf[10];
+    char file_node[100];
+    strcpy(file_node, catch_time);
+    strcat(file_node, "@");
+    strcat(file_node, src_ip);
+    strcat(file_node, "@");
+    strcat(file_node, dest_ip);
+    strcat(file_node, "@");
+    itoa(src_port, buf, 10);
+    strcat(file_node, buf);
+    strcat(file_node, "@");
+    itoa(dest_port, buf, 10);
+    strcat(file_node, buf);
+    strcat(file_node, "@");
+    itoa(packet_len, buf, 10);
+    strcat(file_node, buf);
+    strcat(file_node, "\n");
+
+    char flowName[10];
+    sprintf(flowName, "%s.txt", pro_name);
+    FILE *flow = fopen(flowName, "a+");
+    if(flow == NULL){
+        printf("\n该数据包写入流量分析文件失败\n\n");
+    }else{
+        fprintf(flow, file_node);
+    }
+    fclose(flow);
 }
